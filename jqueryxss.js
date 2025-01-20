@@ -1,4 +1,3 @@
-alert(document.domain);
 alert(document.cookies);
 
 // Fetch the cookies
